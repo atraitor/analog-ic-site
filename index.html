@@ -2,49 +2,31 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>模拟 IC 之路 | 模拟集成电路学习与实战</title>
+  <title>模拟 IC 之路 - ADC / LDO / PLL 学习与实战</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="面向在校生与初入职场工程师的模拟 IC 学习站：运放、LDO、Bandgap、版图与仿真经验、面试与成长路线。">
-  <meta name="keywords" content="模拟IC, 模拟集成电路, 运放, LDO, Bandgap, 版图, 仿真, 面试, 电源管理">
-  <meta property="og:title" content="模拟 IC 之路 | 模拟集成电路学习与实战">
-  <meta property="og:description" content="从基础到项目实践，记录一个模拟 IC 工程师的学习与踩坑经验。">
-  <meta property="og:type" content="website">
+  <meta name="description" content="模拟 IC 学习站：ADC、LDO、PLL 等模拟模块的基础知识与设计思路。" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg-body: #050816;
-      --bg-surface: #0b1220;
-      --bg-surface-soft: #020617;
-      --primary: #3b82f6;
-      --primary-soft: rgba(59,130,246,0.14);
-      --border-subtle: rgba(148,163,184,0.3);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --shadow-soft: 0 18px 45px rgba(15,23,42,0.55);
-      --radius-lg: 18px;
-      --radius-xl: 24px;
-      --transition-fast: 0.18s ease-out;
-    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", sans-serif;
       line-height: 1.6;
-      background: radial-gradient(circle at top, #1d293b 0, #020617 38%, #020617 100%);
-      color: var(--text-main);
+      background-color: #f5f5f7;
+      color: #222;
     }
+    a { color: inherit; }
 
     /* 顶部导航 */
     header {
+      background: #111827;
+      color: #fff;
+      padding: 14px 24px;
       position: sticky;
       top: 0;
-      z-index: 20;
-      backdrop-filter: blur(16px);
-      background: linear-gradient(to bottom, rgba(15,23,42,0.9), rgba(15,23,42,0.5));
-      border-bottom: 1px solid rgba(148,163,184,0.25);
+      z-index: 10;
     }
     .nav {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -52,174 +34,113 @@
     .logo {
       font-weight: 700;
       font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .logo-mark {
-      width: 22px;
-      height: 22px;
-      border-radius: 7px;
-      background: radial-gradient(circle at 20% 0, #38bdf8, #3b82f6 40%, #1d4ed8 100%);
-      box-shadow: 0 0 0 1px rgba(15,23,42,0.8), 0 8px 16px rgba(37,99,235,0.65);
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 13px;
     }
     .nav-links a {
+      margin-left: 16px;
       text-decoration: none;
-      color: var(--text-muted);
-      padding: 4px 10px;
-      border-radius: 999px;
-      transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+      color: #e5e7eb;
+      font-size: 14px;
     }
     .nav-links a:hover {
-      color: #f9fafb;
-      background: rgba(15,23,42,0.85);
-      transform: translateY(-1px);
-    }
-    .nav-links a.primary-link {
-      background: var(--primary-soft);
-      color: #e5edff;
-      border: 1px solid rgba(96,165,250,0.6);
+      color: #ffffff;
     }
 
     main {
       max-width: 1120px;
-      margin: 24px auto 56px;
-      padding: 0 16px 24px;
+      margin: 24px auto 48px;
+      padding: 0 16px;
     }
 
-    /* 英雄区 */
-    .hero {
-      margin-top: 16px;
-      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 60%),
-                  radial-gradient(circle at top right, rgba(96,165,250,0.16), transparent 55%),
-                  linear-gradient(to bottom right, rgba(15,23,42,0.97), rgba(15,23,42,0.96));
-      color: var(--text-main);
-      padding: 28px 24px 24px;
-      border-radius: var(--radius-xl);
-      display: grid;
-      grid-template-columns: 2fr 1.25fr;
-      gap: 26px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148,163,184,0.40);
-    }
-    .hero-title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: 0.04em;
-    }
-    .hero-title span {
-      color: #93c5fd;
-    }
-    .hero-subtitle {
-      font-size: 14px;
-      margin-bottom: 16px;
-      color: var(--text-muted);
-      max-width: 540px;
-    }
-    .hero-highlight {
-      font-size: 13px;
-      color: #dbeafe;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(96,165,250,0.6);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15,23,42,0.82);
-      margin-bottom: 14px;
-    }
-    .hero-tags {
+    /* 整体布局：左侧按钮，右侧内容 */
+    .layout {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
+      gap: 24px;
+      margin-top: 16px;
     }
-    .tag {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(148,163,184,0.55);
-      color: #e5e7eb;
+    .sidebar {
+      width: 200px;
+      position: sticky;
+      top: 88px; /* 跟 header 高度配合 */
+      align-self: flex-start;
     }
-    .hero-actions a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      font-size: 14px;
-      padding: 8px 18px;
-      border-radius: 999px;
-      margin-right: 8px;
-      margin-top: 4px;
-      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
-      cursor: pointer;
+    .side-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px 12px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e5e7eb;
     }
-    .btn-primary {
-      background: var(--primary);
-      color: #f9fafb;
-      box-shadow: 0 12px 30px rgba(37,99,235,0.60);
-    }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 38px rgba(37,99,235,0.75);
-    }
-    .btn-outline {
-      border: 1px solid rgba(148,163,184,0.7);
-      color: var(--text-main);
-      background: rgba(15,23,42,0.9);
-    }
-    .btn-outline:hover {
-      background: rgba(15,23,42,1);
-      transform: translateY(-1px);
-    }
-    .hero-side {
-      border-left: 1px solid rgba(51,65,85,0.8);
-      padding-left: 18px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .hero-side h3 {
+    .side-title {
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 8px;
-      color: #e5e7eb;
     }
-    .hero-side ul {
-      margin-left: 16px;
-      margin-top: 4px;
+    .side-desc {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 10px;
     }
-    .hero-side li {
-      margin-bottom: 3px;
+    .side-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .side-link {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #111827;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .side-link:hover {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.25);
+      transform: translateY(-1px);
+    }
+    .side-link.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    /* 右侧内容区 */
+    .content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .big-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .big-subtitle {
+      font-size: 14px;
+      color: #4b5563;
+      margin-bottom: 18px;
     }
 
     section {
-      margin-top: 36px;
+      margin-top: 28px;
     }
     section h2 {
       font-size: 20px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-    section h2 span {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-left: 6px;
     }
     .section-intro {
       font-size: 13px;
-      color: var(--text-muted);
+      color: #6b7280;
       margin-bottom: 12px;
-      max-width: 720px;
     }
 
     .grid {
@@ -232,110 +153,50 @@
     }
 
     .card {
-      background: radial-gradient(circle at top left, rgba(30,64,175,0.38), rgba(15,23,42,0.96));
-      border-radius: var(--radius-lg);
-      padding: 16px 15px 14px;
-      box-shadow: 0 12px 30px rgba(15,23,42,0.75);
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
       font-size: 14px;
-      border: 1px solid rgba(148,163,184,0.40);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top right, rgba(96,165,250,0.3), transparent 55%);
-      opacity: 0;
-      transition: opacity var(--transition-fast);
-      pointer-events: none;
+      border: 1px solid #e5e7eb;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
     .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 22px 48px rgba(15,23,42,0.9);
-      border-color: rgba(129,140,248,0.95);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
     }
-    .card:hover::before { opacity: 0.85; }
     .card h3 {
       font-size: 15px;
       margin-bottom: 6px;
       font-weight: 600;
-      color: #e5e7eb;
     }
     .card p {
       font-size: 13px;
-      color: #cbd5f5;
+      color: #4b5563;
       margin-bottom: 8px;
     }
     .card small {
       font-size: 12px;
       color: #9ca3af;
     }
-    .badge-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .badge {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      font-size: 11px;
-      color: #e5e7eb;
-      background: rgba(15,23,42,0.85);
-    }
-
-    .list-item {
-      font-size: 13px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(15,23,42,0.86);
-      border: 1px solid rgba(30,64,175,0.7);
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .list-item-title {
-      font-weight: 500;
-      color: #e5e7eb;
-    }
-    .list-item-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
 
     footer {
       text-align: center;
       font-size: 12px;
-      color: var(--text-muted);
+      color: #6b7280;
       margin-top: 40px;
-      padding-bottom: 20px;
-      border-top: 1px solid rgba(30,64,175,0.7);
+      padding-bottom: 24px;
+      border-top: 1px solid #e5e7eb;
       padding-top: 14px;
     }
 
     @media (max-width: 768px) {
-      .hero {
-        grid-template-columns: 1fr;
-        padding: 22px 18px 18px;
+      .layout {
+        flex-direction: column;
       }
-      .hero-side {
-        border-left: none;
-        border-top: 1px solid rgba(51,65,85,0.7);
-        padding-left: 0;
-        padding-top: 14px;
-      }
-      .nav {
-        padding-inline: 12px;
-      }
-      .nav-links {
-        gap: 6px;
-        font-size: 12px;
-      }
-      .nav-links a {
-        padding: 4px 8px;
+      .sidebar {
+        position: static;
+        width: 100%;
       }
     }
   </style>
@@ -343,181 +204,146 @@
 <body>
   <header>
     <div class="nav">
-      <div class="logo">
-        <span class="logo-mark"></span>
-        <!-- 这里可以改成你的品牌名 -->
-        <span>模拟 IC 之路</span>
-      </div>
+      <div class="logo">模拟 IC 之路</div>
       <nav class="nav-links">
-        <a href="#beginner">入门</a>
-        <a href="#practice">设计实践</a>
-        <a href="#updates">最新更新</a>
-        <a href="#career">求职成长</a>
-        <a href="#about" class="primary-link">关于 / 联系</a>
+        <a href="#overview">总览</a>
+        <a href="#adc">ADC</a>
+        <a href="#ldo">LDO</a>
+        <a href="#pll">PLL</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- 英雄区 -->
-    <section class="hero">
-      <div>
-        <div class="hero-highlight">
-          <!-- 可以改成：目前在读学校 / 公司 / 城市 -->
-          模拟 IC / 电源管理 / 模拟前端 · 个人学习站
+    <div class="layout">
+      <!-- 左侧按钮区 -->
+      <aside class="sidebar">
+        <div class="side-card">
+          <div class="side-title">模块导航</div>
+          <div class="side-desc">点击下面按钮快速跳转到对应模块概览。</div>
+          <div class="side-links">
+            <a href="#overview" class="side-link active">总览 / Overview</a>
+            <a href="#adc" class="side-link">ADC 模块</a>
+            <a href="#ldo" class="side-link">LDO 模块</a>
+            <a href="#pll" class="side-link">PLL 模块</a>
+            <!-- 你以后可以继续加：
+            <a href="#opamp" class="side-link">运放模块</a>
+            <a href="#bandgap" class="side-link">Bandgap / 参考</a>
+            -->
+          </div>
         </div>
-        <h1 class="hero-title">
-          从 <span>基础</span> 到 <span>项目</span>，走进模拟 IC 设计世界
-        </h1>
-        <p class="hero-subtitle">
-          记录一个模拟 IC 工程师（或学生）的系统学习路径：从放大电路、偏置与参考，到 LDO、运放、Bandgap 设计，以及版图、仿真和面试经验。希望能帮你少走弯路、看得更远。
-        </p>
-        <div class="hero-tags">
-          <span class="tag">模拟电路基础</span>
-          <span class="tag">运放 / LDO / Bandgap</span>
-          <span class="tag">版图与仿真经验</span>
-          <span class="tag">校招生 & 初级工程师成长</span>
-        </div>
-        <div class="hero-actions">
-          <a href="#beginner" class="btn-primary">从入门路径开始</a>
-          <a href="#updates" class="btn-outline">查看最近在更新什么</a>
-        </div>
-      </div>
-      <aside class="hero-side">
-        <h3>关于我（建议写真实一点）</h3>
-        <p>
-          示例：目前在 XXX 公司/学校从事模拟 IC / 电源管理相关工作，方向包括运放、LDO 及模拟前端。这个站点主要是整理自己的学习与踩坑笔记，同时也希望给刚入门的同学一个参考。
-        </p>
-        <br />
-        <h3>这个站适合谁？</h3>
-        <ul>
-          <li>准备进入模拟 IC 方向的在校生</li>
-          <li>刚入行 1–3 年的模拟工程师</li>
-          <li>想系统梳理模拟基础与设计流程的人</li>
-        </ul>
       </aside>
-    </section>
 
-    <!-- 入门路径 -->
-    <section id="beginner">
-      <h2>入门路径：先把基础打牢 <span>适合 0–1 年阶段</span></h2>
-      <p class="section-intro">
-        如果你刚接触模拟 IC，建议不要一上来就啃复杂项目，而是先补齐电路分析、器件模型，再逐步往放大电路、偏置/参考和运放分析走。下面是一个可以参考的顺序。
-      </p>
-      <div class="grid grid-3">
-        <div class="card">
-          <h3>1. 必备先修知识</h3>
-          <p>半导体物理（只需要到器件 I–V 级）、MOS/BJT 小信号模型、电路分析方法（结点/回路、频域分析）。</p>
-          <small>建议：学校课本 + 一本你习惯的《模拟电子技术》。</small>
-        </div>
-        <div class="card">
-          <h3>2. 三大基础模块</h3>
-          <p>放大、偏置、电流源与参考电路，是后面所有运放、LDO、Bandgap 的基础。一边推导一边用仿真去验证更容易理解。</p>
-          <small>重点：增益、带宽、极点/零点、噪声、失真。</small>
-        </div>
-        <div class="card">
-          <h3>3. 建议学习路线</h3>
-          <p>大致可以拆成：基础课 → 模拟电路 → 小作业电路 → 完整模块（如运放/LDO） → 实习/项目 → 求职。</p>
-          <small>后续会整理成可下载的路线图 PDF。</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- 设计实践 -->
-    <section id="practice">
-      <h2>设计实践：在具体项目中理解权衡 <span>模块级实战</span></h2>
-      <p class="section-intro">
-        真正拉开差距的往往不是公式，而是你如何在指标、工艺、面积、功耗之间做权衡。这里会以运放、LDO 等常见模块为例，拆解完整设计流程。
-      </p>
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>经典 CMOS 运放设计拆解</h3>
-          <p>以两级运放为例，从规格定义、架构选择、增益带宽规划，到频率补偿、电流分配和版图要点，走一遍完整流程。</p>
-          <div class="badge-list">
-            <span class="badge">Spec 定义</span>
-            <span class="badge">频率补偿</span>
-            <span class="badge">版图注意事项</span>
-          </div>
-        </div>
-        <div class="card">
-          <h3>一个简单 LDO 的设计思路</h3>
-          <p>以输出噪声、压差、负载能力、环路稳定性为线索，讲清如何在这些指标之间找到平衡，以及该做哪些关键仿真。</p>
-          <div class="badge-list">
-            <span class="badge">PSRR</span>
-            <span class="badge">相位裕度</span>
-            <span class="badge">Start-up 行为</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 最新更新模块：以后你可以手工维护 -->
-    <section id="updates">
-      <h2>最近在更新什么 <span>你可以把它当「更新日志」</span></h2>
-      <p class="section-intro">
-        这一块建议你每次有新文章、新项目，就简单加一条。访客会很直观地知道：这个站点是活的，而不是几年前的存档。
-      </p>
-      <div class="grid">
-        <div class="list-item">
-          <div class="list-item-title">2025-01 · 补充「运放设计」系列提纲</div>
-          <div class="list-item-meta">计划分为：规格 → 架构 → 补偿 → 版图 → 验证五个部分，后续会逐篇更新。</div>
-        </div>
-        <div class="list-item">
-          <div class="list-item-title">2024-12 · 完成站点搭建 & 首次上线</div>
-          <div class="list-item-meta">使用 GitHub Pages + 纯静态 HTML 构建，后续视情况接入文章列表 / 博客系统。</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 求职与成长 -->
-    <section id="career">
-      <h2>求职与成长：不仅是电路，还有职业路径 <span>校招生 & 1–3 年</span></h2>
-      <p class="section-intro">
-        很多同学在意「要背多少题」「哪些公司在招」，但更重要的是——你的能力结构是什么样子。这里会更多从能力模型和成长路径的角度来聊模拟 IC。
-      </p>
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>模拟 IC 校招生常见面试点</h3>
-          <p>整理运放分析、频率响应、工艺偏差、版图问题等高频考点，并附上「为什么会这么问」的思考。</p>
-          <small>后续会按公司 / 岗位维度拆分面经。</small>
-        </div>
-        <div class="card">
-          <h3>1–3 年工程师的能力地图</h3>
-          <p>从“能看懂别人的电路”到“能独立完成一个模块”，再到“能做架构和 trade-off”，每个阶段需要什么样的积累。</p>
-          <small>也会分享一些实际工作中的坑和经验。</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- 关于与联系 -->
-    <section id="about">
-      <h2>关于本站与联系方式</h2>
-      <p class="section-intro">
-        这个站点会长期更新，但节奏会以业余时间为主。如果你有问题、建议或合作意向，欢迎联系我。
-      </p>
-      <div class="grid">
-        <div class="card">
-          <h3>站点说明</h3>
-          <p>
-            所有内容仅代表个人理解，难免有疏漏或错误，欢迎批评指正。文中如涉及公司/产品，仅为技术讨论，不代表任何官方立场。
+      <!-- 右侧内容区 -->
+      <div class="content">
+        <!-- 大标题 -->
+        <section id="overview">
+          <h1 class="big-title">模拟 IC 模块总览：ADC / LDO / PLL</h1>
+          <p class="big-subtitle">
+            这里主要整理几个常见的模拟模块：ADC、LDO、PLL 等的基础概念、典型架构和学习要点，方便你按模块查阅和扩展自己的笔记。
           </p>
-          <small>如需引用或转载，请标注来源「模拟 IC 之路」及链接。</small>
-        </div>
-        <div class="card">
-          <h3>联系我</h3>
-          <p>
-            邮箱：<strong>your_email@xxx.com</strong><br>
-            微信：可通过公众号或邮件获取<br>
-            其他：后续可能会增加 GitHub / 知乎 / B 站等入口。
-          </p>
-          <small>这里建议只放你愿意公开且常用的联系方式。</small>
-        </div>
-      </div>
-    </section>
 
-    <footer>
-      © 2025 模拟 IC 之路 · Personal IC Design Notes · Powered by GitHub Pages
-    </footer>
+          <section>
+            <h2>如何使用这个页面？</h2>
+            <p class="section-intro">
+              左边是模块按钮，你可以通过「ADC / LDO / PLL」快速跳到下面对应模块小结；右边是每个模块的说明和你可以后续补充的学习内容。
+            </p>
+            <div class="grid grid-3">
+              <div class="card">
+                <h3>ADC 模块</h3>
+                <p>模数转换器，负责把模拟信号变成数字信号。关注分辨率、采样速率、INL/DNL、SNR、ENOB 等指标。</p>
+                <small>典型架构：SAR、Pipeline、Sigma-Delta 等。</small>
+              </div>
+              <div class="card">
+                <h3>LDO 模块</h3>
+                <p>低压差线性稳压器，用于本地稳压、降压。关注压差、负载能力、PSRR、稳定性、静态电流等。</p>
+                <small>典型架构：带误差放大器 + pass 元件 + 参考。</small>
+              </div>
+              <div class="card">
+                <h3>PLL 模块</h3>
+                <p>锁相环，用于时钟生成与频率合成。关注锁定时间、抖动、相噪、环路稳定性等。</p>
+                <small>典型结构：PD/CP + LPF + VCO + 分频器。</small>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ADC 区块 -->
+        <section id="adc">
+          <h2>ADC 模块概览</h2>
+          <p class="section-intro">
+            这一部分可以逐步整理你关于 ADC 的学习：从基本定义，到不同架构的对比，再到具体设计与仿真经验。下面是示例结构，你可以按自己的节奏填充。
+          </p>
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>1. 基本概念与指标</h3>
+              <p>分辨率、采样率、量化噪声、INL/DNL、SNR、SINAD、ENOB 等常见指标，以及它们之间的关系。</p>
+              <small>这里可以写你整理的公式、表格或图示说明。</small>
+            </div>
+            <div class="card">
+              <h3>2. 典型架构与适用场景</h3>
+              <p>SAR、Flash、Pipeline、Sigma-Delta 等架构的大致原理、复杂度对比，以及各自适用的频率/精度范围。</p>
+              <small>未来可以扩展成单独页面或文章链接。</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- LDO 区块 -->
+        <section id="ldo">
+          <h2>LDO 模块概览</h2>
+          <p class="section-intro">
+            LDO 是电源管理里非常常见的模块，可以在这里归纳其基本原理、关键指标、补偿方式与版图注意事项。
+          </p>
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>1. 关键指标与权衡</h3>
+              <p>输出电压精度、压差、负载调整率、线性调整率、PSRR、输出噪声、纹波、瞬态响应等。</p>
+              <small>可以附上你在项目或仿真中的典型数据。</small>
+            </div>
+            <div class="card">
+              <h3>2. 架构与稳定性</h3>
+              <p>带误差放大器的闭环结构、输出电容的影响、频率补偿方案（内部补偿 / 外部补偿）。</p>
+              <small>后续可增加相位裕度仿真截图和 Bode 图。</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- PLL 区块 -->
+        <section id="pll">
+          <h2>PLL 模块概览</h2>
+          <p class="section-intro">
+            PLL 主要用于时钟生成和频率合成，这里可以总结环路组成、相噪与抖动分析，以及环路参数设计思路。
+          </p>
+          <div class="grid grid-2">
+            <div class="card">
+              <h3>1. 环路组成与工作原理</h3>
+              <p>鉴相器 (PD)、电荷泵 (CP)、环路滤波器 (LPF)、压控振荡器 (VCO) 与分频链之间的关系。</p>
+              <small>可以补上常见的整数 N / Fractional-N 结构对比。</small>
+            </div>
+            <div class="card">
+              <h3>2. 指标与设计关注点</h3>
+              <p>锁定时间、相噪、抖动、参考杂散、带宽设置与稳定性，如何在这些指标之间做 trade-off。</p>
+              <small>未来可扩展：仿真流程、版图注意点。</small>
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          © 2025 模拟 IC 之路 · ADC / LDO / PLL Notes · Powered by GitHub Pages
+        </footer>
+      </div>
+    </div>
   </main>
+
+  <script>
+    // 简单高亮左侧当前点击的按钮（前端 JS，可选）
+    const links = document.querySelectorAll('.side-link');
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
