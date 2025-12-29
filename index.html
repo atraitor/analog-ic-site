@@ -222,10 +222,10 @@
           <div class="side-title">模块导航</div>
           <div class="side-desc">点击下面按钮快速跳转到对应模块概览。</div>
           <div class="side-links">
-            <a href="#overview" class="side-link active">总览 / Overview</a>
-            <a href="#adc" class="side-link">ADC 模块</a>
-            <a href="#ldo" class="side-link">LDO 模块</a>
-            <a href="#pll" class="side-link">PLL 模块</a>
+            <a href="#overview" class="side-link active" id="nav-overview">总览 / Overview</a>
+            <a href="#adc" class="side-link" id="nav-adc">ADC 模块</a>
+            <a href="#ldo" class="side-link" id="nav-ldo">LDO 模块</a>
+            <a href="#pll" class="side-link" id="nav-pll">PLL 模块</a>
             <!-- 你以后可以继续加：
             <a href="#opamp" class="side-link">运放模块</a>
             <a href="#bandgap" class="side-link">Bandgap / 参考</a>
@@ -238,16 +238,16 @@
       <div class="content">
         <!-- 大标题 -->
         <section id="overview">
-          <h1 class="big-title">模拟 IC 模块总览：ADC / LDO / PLL</h1>
-          <p class="big-subtitle">
+          <h1 class="big-title" id="page-title">模拟 IC 模块总览：ADC / LDO / PLL</h1>
+          <p class="big-subtitle" id="page-subtitle">
             这里主要整理几个常见的模拟模块：ADC、LDO、PLL 等的基础概念、典型架构和学习要点，方便你按模块查阅和扩展自己的笔记。
           </p>
 
-          <section>
+          <section id="overview">
             <h2>如何使用这个页面？</h2>
-            <p class="section-intro">
-              左边是模块按钮，你可以通过「ADC / LDO / PLL」快速跳到下面对应模块小结；右边是每个模块的说明和你可以后续补充的学习内容。
-            </p>
+            <div class="section-intro" id="overview-content">
+              这里是总览内容示例，将来会由后台配置替换。
+            </div>
             <div class="grid grid-3">
               <div class="card">
                 <h3>ADC 模块</h3>
@@ -271,9 +271,9 @@
         <!-- ADC 区块 -->
         <section id="adc">
           <h2>ADC 模块概览</h2>
-          <p class="section-intro">
-            这一部分可以逐步整理你关于 ADC 的学习：从基本定义，到不同架构的对比，再到具体设计与仿真经验。下面是示例结构，你可以按自己的节奏填充。
-          </p>
+          <div class="section-intro" id="adc-content">
+            这里是 ADC 模块的介绍示例，将来会被后台内容替换。
+          </div>
           <div class="grid grid-2">
             <div class="card">
               <h3>1. 基本概念与指标</h3>
@@ -291,9 +291,9 @@
         <!-- LDO 区块 -->
         <section id="ldo">
           <h2>LDO 模块概览</h2>
-          <p class="section-intro">
-            LDO 是电源管理里非常常见的模块，可以在这里归纳其基本原理、关键指标、补偿方式与版图注意事项。
-          </p>
+          <div class="section-intro" id="ldo-content">
+            这里是 LDO 模块的介绍示例，将来会被后台内容替换。
+          </div>
           <div class="grid grid-2">
             <div class="card">
               <h3>1. 关键指标与权衡</h3>
@@ -311,9 +311,9 @@
         <!-- PLL 区块 -->
         <section id="pll">
           <h2>PLL 模块概览</h2>
-          <p class="section-intro">
-            PLL 主要用于时钟生成和频率合成，这里可以总结环路组成、相噪与抖动分析，以及环路参数设计思路。
-          </p>
+          <div class="section-intro" id="pll-content">
+            这里是 PLL 模块的介绍示例，将来会被后台内容替换。
+          </div>
           <div class="grid grid-2">
             <div class="card">
               <h3>1. 环路组成与工作原理</h3>
@@ -345,5 +345,67 @@
       });
     });
   </script>
+  <script>
+  // 你的 CMS 配置接口地址
+  const CMS_API = "https://analog-cms-backend.onrender.com/api/config";
+
+  async function applyCMS() {
+    try {
+      const res = await fetch(CMS_API);
+      const cfg = await res.json();
+
+      // 1. 更新大标题与副标题
+      if (cfg.title && document.getElementById("page-title")) {
+        document.getElementById("page-title").textContent = cfg.title;
+      }
+      if (cfg.subtitle && document.getElementById("page-subtitle")) {
+        document.getElementById("page-subtitle").textContent = cfg.subtitle;
+      }
+
+      const modules = cfg.modules || [];
+
+      // 工具：根据 id 找模块
+      function findModule(id) {
+        return modules.find(m => m.id === id);
+      }
+
+      // 2. 更新总览 / ADC / LDO / PLL 内容
+      const map = [
+        { id: "overview", elId: "overview-content" },
+        { id: "adc",      elId: "adc-content" },
+        { id: "ldo",      elId: "ldo-content" },
+        { id: "pll",      elId: "pll-content" }
+      ];
+
+      map.forEach(item => {
+        const m = findModule(item.id);
+        if (!m || !m.content) return;
+        const el = document.getElementById(item.elId);
+        if (el) {
+          el.innerHTML = m.content; // 允许后台写简单 HTML
+        }
+      });
+
+      // 3. （可选）用模块名称更新左侧按钮文字
+      const navMap = [
+        { id: "overview", navId: "nav-overview" },
+        { id: "adc",      navId: "nav-adc" },
+        { id: "ldo",      navId: "nav-ldo" },
+        { id: "pll",      navId: "nav-pll" }
+      ];
+      navMap.forEach(item => {
+        const m = findModule(item.id);
+        const navEl = document.getElementById(item.navId);
+        if (m && navEl && m.name) {
+          navEl.textContent = m.name;
+        }
+      });
+    } catch (e) {
+      console.error("加载 CMS 配置失败：", e);
+    }
+  }
+
+  applyCMS();
+</script>
 </body>
 </html>
